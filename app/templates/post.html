@@ -1,0 +1,59 @@
+{% extends 'base.html' %}
+
+{% macro render_comments(comments) %}
+    {% for comment in comments %}
+        <div class="d-flex mb-4">
+            <div class="flex-shrink-0">
+                <img class="rounded-circle" width="50" height="50"
+                     src="{{ url_for('static', filename='images/avatar.jpg') }}" alt="Аватар автора комментария">
+            </div>
+            <div class="ms-3">
+                <div class="fw-bold">{{ comment.author }}</div>
+                <p class="mb-2">{{ comment.text }}</p>
+                {% if comment.replies %}
+                    <div class="ms-4 border-start ps-3">
+                        {{ render_comments(comment.replies) }}
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    {% endfor %}
+{% endmacro %}
+
+{% block content %}
+<article class="mb-5">
+    <h1 class="my-4">{{ post.title }}</h1>
+
+    <p class="text-muted">
+        Автор: <span class="fw-bold">{{ post.author }}</span> |
+        Дата публикации: {{ post.date.strftime('%d.%m.%Y %H:%M') }}
+    </p>
+
+    <img class="img-fluid rounded mb-4" src="{{ url_for('static', filename='images/' + post.image_id) }}" alt="Изображение поста">
+
+    <p class="lead" style="white-space: pre-line;">{{ post.text }}</p>
+</article>
+
+<section class="card mb-5">
+    <div class="card-header">Оставьте комментарий</div>
+    <div class="card-body">
+        <form method="post" action="#">
+            <div class="mb-3">
+                <label class="form-label" for="comment-text">Текст комментария</label>
+                <textarea class="form-control" id="comment-text" name="comment" rows="4"
+                          placeholder="Введите комментарий"></textarea>
+            </div>
+            <button class="btn btn-primary" type="submit">Отправить</button>
+        </form>
+    </div>
+</section>
+
+<section class="mb-5">
+    <h2 class="mb-4">Комментарии</h2>
+    {% if post.comments %}
+        {{ render_comments(post.comments) }}
+    {% else %}
+        <p class="text-muted">Комментариев пока нет.</p>
+    {% endif %}
+</section>
+{% endblock %}
